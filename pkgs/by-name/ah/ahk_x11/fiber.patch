@@ -1,0 +1,60 @@
+diff --git a/src/hacks.cr b/src/hacks.cr
+index 06eb696..93a98a4 100644
+--- a/src/hacks.cr
++++ b/src/hacks.cr
+@@ -46,43 +46,3 @@ class Hacks
+ 		end
+ 	end
+ end
+-
+-# https://github.com/crystal-lang/crystal/issues/13297
+-class Fiber
+-	# Code copied over and extended from stdlib
+-	def run
+-		GC.unlock_read
+-		@proc.call
+-	rescue ex
+-		if handler = Hacks.fiber_on_unhandled_exception
+-			handler.call ex
+-		else
+-			if name = @name
+-				STDERR.print "Unhandled exception in spawn (name: #{name}): "
+-			else
+-				STDERR.print "Unhandled exception in spawn: "
+-			end
+-			ex.inspect_with_backtrace(STDERR)
+-			STDERR.flush
+-		end
+-	ensure
+-		{% if flag?(:preview_mt) %}
+-			Crystal::Scheduler.enqueue_free_stack @stack
+-		{% elsif flag?(:interpreted) %}
+-			# For interpreted mode we don't need a new stack, the stack is held by the interpreter
+-		{% else %}
+-			Fiber.stack_pool.release(@stack)
+-		{% end %}
+-
+-		# Remove the current fiber from the linked list
+-		Fiber.fibers.delete(self)
+-
+-		# Delete the resume event if it was used by `yield` or `sleep`
+-		@resume_event.try &.free
+-		@timeout_event.try &.free
+-		@timeout_select_action = nil
+-
+-		@alive = false
+-		Crystal::Scheduler.reschedule
+-	end
+-end
+\ No newline at end of file
+diff --git a/src/run/display/x11.cr b/src/run/display/x11.cr
+index 5936af4..2ed8c7a 100644
+--- a/src/run/display/x11.cr
++++ b/src/run/display/x11.cr
+@@ -452,4 +452,4 @@ module Run
+ 			display.flush # <- I DON'T KNOW WHY BUT I WANT MY THREE HOURS BACK
+ 		end
+ 	end
+-end
+\ No newline at end of file
++end

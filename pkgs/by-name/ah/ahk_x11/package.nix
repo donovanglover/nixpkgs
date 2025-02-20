@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  crystal_1_11,
+  crystal_1_14,
   copyDesktopItems,
   linkFarm,
   fetchgit,
@@ -32,8 +32,7 @@ let
     ;
 
   # See upstream README. Crystal 1.11 or below is needed to work around phil294/AHK_X11#89.
-  crystal = crystal_1_11;
-
+  crystal = crystal_1_14;
 in
 crystal.buildCrystalPackage {
   inherit pname version;
@@ -49,7 +48,10 @@ crystal.buildCrystalPackage {
   # Fix build problems and the following UX problem:
   # Without this patch, the binary launches a graphical installer GUI that is useless with system-wide installation.
   # With this patch, it prompts to use -h for help.
-  patches = [ ./adjust.patch ];
+  patches = [
+    ./adjust.patch
+    ./fiber.patch
+  ];
 
   shardsFile = ./shards.nix;
   copyShardDeps = true;
