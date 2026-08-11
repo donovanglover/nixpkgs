@@ -255,7 +255,7 @@ stdenv.mkDerivation (finalAttrs: {
     # The updater is needed for nixos env and it's tiny.
     moveToOutput bin/gtk4-update-icon-cache "$out"
     # Launcher
-    moveToOutput bin/gtk-launch "$out"
+    moveToOutput bin/gtk4-launch "$out"
 
     # TODO: patch glib directly
     for f in $dev/bin/gtk4-encode-symbolic-svg; do
